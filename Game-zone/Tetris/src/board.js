@@ -1,13 +1,15 @@
-import { COLORS } from "./blocks.js";
+import { Formatter } from "./format.js";
 
 export class Board {
   constructor(width, height) {
     this.width = width;
     this.height = height;
-    this.grid = this.createBoard();
-    this.edge = "🟫";
-    this.topBottomBorder = this.edge + this.edge.repeat(this.width) + this.edge;
-    this.heading = this.formatHeading();
+    this.format = new Formatter();
+    this.init();
+  }
+
+  init() {
+    this.grid = this.createBoard()
   }
 
   createBoard() {
@@ -18,25 +20,27 @@ export class Board {
     return this.grid.map((row) => row.slice());
   }
 
-  addBlock({ block, x, y }, board) {
-    block.tetrimino.forEach((row, dy) =>
+  drawPieceOn({ tetrimino, color, x, y }, board) {
+    tetrimino.forEach((row, dy) =>
       row.forEach((cell, dx) => {
-        if (cell) board[y + dy][x + dx] = block.color;
+        if (cell) board[y + dy][x + dx] = color;
       })
     );
   }
 
   lockPiece(piece) {
-    return this.addBlock(piece, this.grid);
+    return this.drawPieceOn(piece, this.grid);
   }
 
   clearLines() {
-    console.log(this.grid.length);
-    this.grid = this.grid.filter((row) => row.some((cell) => !cell));
-    console.log(this.grid.length, "grid");
+    this.grid = this.getUnfilledRows();
     while (this.grid.length < this.height) {
       this.grid.unshift(Array(this.width).fill(0));
     }
+  }
+
+  getUnfilledRows() {
+    return this.grid.filter((row) => row.some((cell) => !cell));
   }
 
   isInside(x, y) {
@@ -47,41 +51,17 @@ export class Board {
     return !this.isInside(x, y) || this.grid[y][x];
   }
 
-  isPieceColliding(piece) {
-    const { block, x, y } = piece;
-    return block.tetrimino.some((row, dy) =>
-      row.some((cell, dx) => cell && this.isCellOccupied(x + dx, y + dy))
+  isPieceColliding({ tetrimino, x, y }) {
+    return tetrimino.some((row, py) =>
+      row.some((cell, px) => cell && this.isCellOccupied(x + px, y + py))
     );
-  }
-
-  formatHeading() {
-    const topBorder = `┏━${"━━".repeat(this.width)}━┓`;
-    const padSpace = "  ".repeat(this.width / 2 - 1);
-    const heading = `┃${padSpace} TETRIS ${padSpace}┃`;
-    const bottomBorder = `┗━${"━━".repeat(this.width)}━┛`;
-    return [topBorder, heading, bottomBorder];
-  }
-
-  formatRow(row) {
-    const middle = row.map((cell) => cell ? COLORS[cell] : "  ").join("");
-    return this.edge.concat(middle, this.edge);
-  }
-
-  format(grid) {
-    const rows = grid.map((row) => this.formatRow(row));
-    return [
-      ...this.heading,
-      this.topBottomBorder,
-      ...rows,
-      this.topBottomBorder,
-    ].join("\n");
   }
 
   draw(piece) {
     console.clear();
     const temp = this.createTempBoard();
-    if (piece) this.addBlock(piece, temp);
-    const output = this.format(temp);
+    if (piece) this.drawPieceOn(piece, temp);
+    const output = this.format.frameTetrisSpace(this.width, temp);
     console.log(output);
   }
 }

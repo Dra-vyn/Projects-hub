@@ -4,7 +4,21 @@ import { BLOCKS } from "./blocks.js";
 export class Tetris {
   constructor(width, height) {
     this.board = new Board(width, height);
-    this.spawnPiece();
+    this.#init();
+  }
+
+  #init() {
+    this.advanceToNextPiece();
+  }
+
+  advanceToNextPiece() {
+    this.activePiece = this.spawnPiece();
+    this.handleGameOver();
+    return this.activePiece;
+  }
+
+  handleGameOver() {
+    if (!this.canPlacePiece(this.activePiece)) this.gameOver();
   }
 
   spawnPosition(block) {
@@ -15,47 +29,53 @@ export class Tetris {
   }
 
   spawnPiece() {
-    const block = this.randomTetrimino();
-    this.piece = { block, ...this.spawnPosition(block) };
-    if (this.board.isPieceColliding(this.piece)) this.gameOver();
+    const block = this.randomTetrimino()
+    return { ...block, ...this.spawnPosition(block) };
   }
 
   randomTetrimino() {
     return BLOCKS[Math.floor(Math.random() * BLOCKS.length)];
   }
 
-  translate(dx, dy) {
-    const { block, x, y } = this.piece;
-    const newPos = { block, x: x + dx, y: y + dy };
-    if (!this.board.isPieceColliding(newPos)) this.piece = newPos;
+  move(dx, dy) {
+    const movedPiece = this.getMovedPiece(dx, dy);
+    if (this.canPlacePiece(movedPiece))
+      this.activePiece = movedPiece;
   }
 
-  rotate(block) {
+  getMovedPiece(dx = 0, dy = 1) {
+    const x = this.activePiece.x + dx;
+    const y = this.activePiece.y + dy;
+    return { ...this.activePiece, x, y };
+  }
+
+  canPlacePiece(piece) {
+    return !this.board.isPieceColliding(piece);
+  }
+
+  rotateBlock(block) {
     return block[0].map((_, i) => block.map((row) => row[i]).reverse());
   }
 
-  rotatePiece() {
-    const rotated = { color: this.piece.block.color };
-    rotated.tetrimino = this.rotate(this.piece.block.tetrimino);
-    const nextPiece = { ...this.piece, block: rotated };
-    if (!this.board.isPieceColliding(nextPiece)) {
-      this.piece.block = rotated;
-    }
+  rotate(piece) {
+    const rotated = this.rotateBlock(piece.tetrimino);
+    const nextPiece = { ...piece, tetrimino: rotated};
+    if (!this.board.isPieceColliding(nextPiece)) piece.tetrimino = rotated;
   }
 
   finalizePiece() {
-    this.board.lockPiece(this.piece);
+    this.board.lockPiece(this.activePiece);
     this.board.clearLines();
-    this.spawnPiece();
+    this.advanceToNextPiece();
   }
 
   update() {
-    const nextPos = { ...this.piece, y: this.piece.y + 1 };
-    this.board.isPieceColliding(nextPos)
-      ? this.finalizePiece()
-      : this.piece.y++;
-
-    this.board.draw(this.piece);
+    const movedPiece = this.getMovedPiece(0, 1);
+    this.canPlacePiece(movedPiece)
+      ? this.activePiece.y++
+      : this.finalizePiece();
+    
+    this.board.draw(this.activePiece);
   }
 
   gameOver() {
