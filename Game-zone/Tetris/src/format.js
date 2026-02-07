@@ -1,7 +1,7 @@
 export class Formatter {
   constructor() {
     this.wall = "🟫";
-    // this.border = "🔹";
+    this.border = "🔹";
     this.empty = "  ";
     this.title = "T E T R I S";
 
@@ -13,10 +13,11 @@ export class Formatter {
     this.horizontal = "━";
   }
 
-  frameTetrisSpace(width, grid) {
+  frameTetrisSpace(width, grid, hud) {
     const layoutMetrics = this.computeLayout(width);
     return [
       ...this.header(layoutMetrics),
+      ...this.hud(layoutMetrics, hud),
       ...this.renderBoard(grid, layoutMetrics),
     ].join("\n");
   }
@@ -40,6 +41,24 @@ export class Formatter {
     const middle = this.frameWith(this.vertical, centeredText, this.vertical);
     const bottom = this.renderBorder(this.corners.bottom, layoutMetrics);
     return [top, middle, bottom];
+  }
+
+  hud({ frameWidth }, { nextPiece, score }) {
+    const wallBorder = this.border.repeat(frameWidth / 2);
+    const piece = this.renderNextPiece(nextPiece);
+    const scores = this.renderScore(score)
+    return [wallBorder,piece, scores, wallBorder]
+  }
+
+  renderScore({ points, lines }) {
+    return `Score : ${points}   lines Cleared : ${lines}`
+  }
+
+  renderNextPiece(piece) {
+    const nextPiece = piece.tetrimino
+      .map(row => row.map(cell => cell ? piece.color : '  ').join('')).join('\n');
+
+    return `Next Piece :\n${nextPiece}`;
   }
 
   renderBorder({ left, right }, { contentWidth }) {

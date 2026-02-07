@@ -34,9 +34,13 @@ export class Board {
 
   clearLines() {
     this.grid = this.getUnfilledRows();
+    const linesCleared = this.height - this.grid.length;
+
     while (this.grid.length < this.height) {
       this.grid.unshift(Array(this.width).fill(0));
     }
+
+    return linesCleared;
   }
 
   getUnfilledRows() {
@@ -63,14 +67,15 @@ export class Board {
     return temp;
   }
 
-  formatBoard(grid) {
-    return this.format.frameTetrisSpace(this.width, grid);
+  formatBoard(grid, nextPiece) {
+    return this.format.frameTetrisSpace(this.width, grid, nextPiece);
   }
 
-  draw(piece) {
+  draw(piece, nextPiece, score) {
+    const hud = { nextPiece, score };
     console.clear();
     const grid = this.render(piece);
-    const output = this.formatBoard(grid);
+    const output = this.formatBoard(grid, hud);
     console.log(output);
   }
 }

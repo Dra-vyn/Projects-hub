@@ -5,6 +5,11 @@ import { Piece } from "./piece.js";
 export class Tetris {
   constructor(width, height) {
     this.board = new Board(width, height);
+    this.score = {
+      points: 0,
+      lines: 0,
+    }
+
     this.#init();
   }
 
@@ -79,13 +84,20 @@ export class Tetris {
       this.finalizePiece();
     }
 
-    this.board.draw(this.activePiece);
+    this.board.draw(this.activePiece, this.nextPiece, this.score);
   }
 
   finalizePiece() {
     this.board.lockPiece(this.activePiece);
-    this.board.clearLines();
-    this.advanceToNextPiece();
+    const linesCleared = this.board.clearLines();
+    this.updateScore(linesCleared);
+    this.#init();
+  }
+
+  updateScore(linesCleared) {
+    const points = { 0: 0, 1: 40, 2: 100, 3: 300, 4: 1200 };
+    this.score.points += linesCleared in points ? points[linesCleared] * 1 : 2000;
+    this.score.lines += linesCleared;
   }
 
   gameOver() {

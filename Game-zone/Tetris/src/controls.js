@@ -21,7 +21,8 @@ export class Controls {
     for await (const chunk of Deno.stdin.readable) {
       const key = decoder.decode(chunk);
       this.handleInput(key);
-      if (!this.paused) this.game.board.draw(this.game.activePiece);
+      if (!this.paused)
+        this.game.board.draw(this.game.activePiece, this.game.nextPiece, this.game.score);
     }
   }
 
