@@ -9,7 +9,7 @@ export class Board {
   }
 
   init() {
-    this.grid = this.createBoard()
+    this.grid = this.createBoard();
   }
 
   createBoard() {
@@ -20,7 +20,7 @@ export class Board {
     return this.grid.map((row) => row.slice());
   }
 
-  drawPieceOn({ tetrimino, color, x, y }, board) {
+  drawPieceOn(board, { tetrimino, color, x, y }) {
     tetrimino.forEach((row, dy) =>
       row.forEach((cell, dx) => {
         if (cell) board[y + dy][x + dx] = color;
@@ -29,7 +29,7 @@ export class Board {
   }
 
   lockPiece(piece) {
-    return this.drawPieceOn(piece, this.grid);
+    return this.drawPieceOn(this.grid, piece);
   }
 
   clearLines() {
@@ -57,11 +57,20 @@ export class Board {
     );
   }
 
+  render(piece) {
+    const temp = this.createTempBoard();
+    if (piece) this.drawPieceOn(temp, piece);
+    return temp;
+  }
+
+  formatBoard(grid) {
+    return this.format.frameTetrisSpace(this.width, grid);
+  }
+
   draw(piece) {
     console.clear();
-    const temp = this.createTempBoard();
-    if (piece) this.drawPieceOn(piece, temp);
-    const output = this.format.frameTetrisSpace(this.width, temp);
+    const grid = this.render(piece);
+    const output = this.formatBoard(grid);
     console.log(output);
   }
 }

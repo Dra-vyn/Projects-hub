@@ -1,5 +1,6 @@
 import { Board } from "./board.js";
 import { BLOCKS } from "./blocks.js";
+import { Piece } from "./piece.js";
 
 export class Tetris {
   constructor(width, height) {
@@ -9,16 +10,23 @@ export class Tetris {
 
   #init() {
     this.advanceToNextPiece();
+    this.nextPiece = this.spawnPiece();
   }
 
   advanceToNextPiece() {
-    this.activePiece = this.spawnPiece();
+    this.activePiece = this.nextPiece || this.spawnPiece();
     this.handleGameOver();
     return this.activePiece;
   }
 
-  handleGameOver() {
-    if (!this.canPlacePiece(this.activePiece)) this.gameOver();
+  spawnPiece() {
+    const block = this.randomTetrimino();
+    const { x, y } = this.spawnPosition(block);
+    return new Piece(block.tetrimino, block.color, x, y);
+  }
+
+  randomTetrimino() {
+    return BLOCKS[Math.floor(Math.random() * BLOCKS.length)];
   }
 
   spawnPosition(block) {
@@ -28,54 +36,56 @@ export class Tetris {
     };
   }
 
-  spawnPiece() {
-    const block = this.randomTetrimino()
-    return { ...block, ...this.spawnPosition(block) };
-  }
-
-  randomTetrimino() {
-    return BLOCKS[Math.floor(Math.random() * BLOCKS.length)];
-  }
-
-  move(dx, dy) {
-    const movedPiece = this.getMovedPiece(dx, dy);
-    if (this.canPlacePiece(movedPiece))
-      this.activePiece = movedPiece;
-  }
-
-  getMovedPiece(dx = 0, dy = 1) {
-    const x = this.activePiece.x + dx;
-    const y = this.activePiece.y + dy;
-    return { ...this.activePiece, x, y };
+  handleGameOver() {
+    if (!this.canPlacePiece(this.activePiece)) this.gameOver();
   }
 
   canPlacePiece(piece) {
     return !this.board.isPieceColliding(piece);
   }
 
-  rotateBlock(block) {
-    return block[0].map((_, i) => block.map((row) => row[i]).reverse());
+  moveLeft() {
+    this.move(-1, 0);
   }
 
-  rotate(piece) {
-    const rotated = this.rotateBlock(piece.tetrimino);
-    const nextPiece = { ...piece, tetrimino: rotated};
-    if (!this.board.isPieceColliding(nextPiece)) piece.tetrimino = rotated;
+  moveRight() {
+    this.move(1, 0);
+  }
+
+  softDrop() {
+    this.move(0, 1);
+  }
+
+  rotate() {
+    this.rotatePiece(this.activePiece);
+  }
+
+  move(dx, dy) {
+    const movedPiece = this.activePiece.moved(dx, dy);
+    if (this.canPlacePiece(movedPiece)) this.activePiece = movedPiece;
+  }
+
+  rotatePiece(piece) {
+    const rotated = piece.rotate(piece.tetrimino);
+    if (!this.board.isPieceColliding(rotated)) this.activePiece = rotated;
+  }
+
+  update() {
+    const movedPiece = this.activePiece.moved(0, 1);
+
+    if (this.canPlacePiece(movedPiece)) {
+      this.activePiece = movedPiece;
+    } else {
+      this.finalizePiece();
+    }
+
+    this.board.draw(this.activePiece);
   }
 
   finalizePiece() {
     this.board.lockPiece(this.activePiece);
     this.board.clearLines();
     this.advanceToNextPiece();
-  }
-
-  update() {
-    const movedPiece = this.getMovedPiece(0, 1);
-    this.canPlacePiece(movedPiece)
-      ? this.activePiece.y++
-      : this.finalizePiece();
-    
-    this.board.draw(this.activePiece);
   }
 
   gameOver() {

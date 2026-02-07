@@ -2,65 +2,71 @@ export class Formatter {
   constructor() {
     this.wall = "🟫";
     // this.border = "🔹";
-    this.tLC = "┏━";
-    this.tRC = "━┓";
-    this.bLC = "┗━";
-    this.bRC = "━┛";
-    this.side = "┃";
-    this.middle = "━━";
+    this.empty = "  ";
     this.title = "T E T R I S";
+
+    this.corners = {
+      top: { left: "┏━", right: "━┓" },
+      bottom: { left: "┗━", right: "━┛" },
+    };
+    this.vertical = "┃";
+    this.horizontal = "━";
   }
 
   frameTetrisSpace(width, grid) {
-    const title = this.frameHeader(width);
-    const board = this.frameBoard(width, grid);
-    return [...title, ...board].join("\n");
+    const layoutMetrics = this.computeLayout(width);
+    return [
+      ...this.header(layoutMetrics),
+      ...this.renderBoard(grid, layoutMetrics),
+    ].join("\n");
   }
 
-  frameBoard(width, grid) {
-    const hBorder = this.horizontalBorder(width);
-    const rows = this.frameSideWall(grid);
-    return [hBorder, ...rows, hBorder];
+  computeLayout(playFieldWidth) {
+    const cellWidth = 2;
+    const titleWallWidth = this.vertical.length;
+    const contentWidth = playFieldWidth * cellWidth;
+    return {
+      playFieldWidth,
+      titleWallWidth,
+      contentWidth,
+      titleInnerWidth: contentWidth + titleWallWidth,
+      frameWidth: contentWidth + 2 * cellWidth,
+    };
   }
 
-  frameHeader(width) {
-    const topBorder = this.getTopBorder(width);
-    const middle = this.getMiddleBorder(width);
-    const bottomBorder = this.getBottomBorder(width);
-    return [topBorder, middle, bottomBorder];
+  header(layoutMetrics) {
+    const top = this.renderBorder(this.corners.top, layoutMetrics);
+    const centeredText = this.centerText(this.title, layoutMetrics);
+    const middle = this.frameWith(this.vertical, centeredText, this.vertical);
+    const bottom = this.renderBorder(this.corners.bottom, layoutMetrics);
+    return [top, middle, bottom];
   }
 
-  getTopBorder(width) {
-    return this.tLC + this.middle.repeat(width) + this.tRC;
+  renderBorder({ left, right }, { contentWidth }) {
+    return left + this.horizontal.repeat(contentWidth) + right;
   }
 
-  getPadLengths(title, width) {
-    return { leftPad: width + 1 + title.length / 2, rightPad: (width + 1) * 2 };
+  frameWith(left, content, right) {
+    return left + content + right;
   }
 
-  getPaddedTitle(width) {
-    const { leftPad, rightPad } = this.getPadLengths(this.title, width);
-    return this.title.padStart(leftPad).padEnd(rightPad);
+  centerText(text, { titleInnerWidth, frameWidth }) {
+    return text
+      .padStart((titleInnerWidth + text.length) / 2)
+      .padEnd(frameWidth - 2);
   }
 
-  getMiddleBorder(width) {
-    return this.side + this.getPaddedTitle(width) + this.side;
+  renderBoard(grid, { frameWidth }) {
+    const wallBorder = this.wall.repeat(frameWidth / 2);
+    return [
+      wallBorder,
+      ...grid.map((row) => this.renderBoardRow(row)),
+      wallBorder,
+    ];
   }
 
-  getBottomBorder(width) {
-    return this.bLC + this.middle.repeat(width) + this.bRC;
-  }
-
-  horizontalBorder(width) {
-    return this.wall.repeat(width + 2);
-  }
-
-  frameSideWall(grid) {
-    return grid.map((row) => this.frameRow(row));
-  }
-
-  frameRow(row) {
-    const line = row.map((cell) => cell ? cell : "  ").join("");
-    return this.wall.concat(line, this.wall);
+  renderBoardRow(row) {
+    const content = row.map((cell) => cell || this.empty).join("");
+    return this.frameWith(this.wall, content, this.wall);
   }
 }
