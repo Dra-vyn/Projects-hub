@@ -1,16 +1,27 @@
 export class Formatter {
   constructor() {
     this.wall = "🟫";
-    this.border = "🔹";
+    this.border = "🟦";
     this.empty = "  ";
     this.title = "T E T R I S";
+    this.HUDWidth = 15;
+    this.maxHeight = 4;
+    this.instructions = [
+      `  ⬅   : MOVE LEFT`,
+      `  ➡   : MOVE RIGHT`,
+      `  ⬇   : SOFT DROP`,
+      `  ⬆   : ROTATE PIECE`,
+      '',
+      `  ESC : PAUSE / CONTINUE`,
+      `  CTRL + c : EXIT`
+    ];
 
-    this.corners = {
-      top: { left: "┏━", right: "━┓" },
-      bottom: { left: "┗━", right: "━┛" },
-    };
-    this.vertical = "┃";
-    this.horizontal = "━━";
+    this.init();
+  }
+  
+  init() {
+    this.innerHUDWidth = this.HUDWidth * 2 - 4;
+    this.defaultHUDLine = this.HUDBorder(this.centerText(""));
   }
 
   frameTetrisSpace(grid, hud) {
@@ -23,7 +34,7 @@ export class Formatter {
   buildBoardLines(grid) {
     const width = grid[0].length + 2;
     const boardLine = grid.map((row) =>
-      this.wrapWith(this.renderRowCells(row), this.wall)
+      this.wrapWith(this.renderRowCells(row), this.wall, this.border)
     );
     return [
       this.buildBorder(this.wall, width),
@@ -36,60 +47,76 @@ export class Formatter {
     return row.map((cell) => cell || this.empty).join("");
   }
 
-  wrapWith(content, wall) {
-    return wall + content + wall;
+  wrapWith(content, wall, border) {
+    return border + wall + content + wall + border;
   }
 
   buildHUD({ nextPiece, score }) {
     return [
-      this.buildBorder(this.border),
-      ...this.buildNextPieceLines(nextPiece),
+      this.separator(),
       ...this.buildScoreLines(score),
-      this.buildBorder(this.border),
+      this.defaultHUDLine,
+      ...this.buildNextPieceLines(nextPiece),
+      this.separator(),
+      this.defaultHUDLine,
+      ...this.buildInstructions(),
     ];
   }
 
+  buildInstructions() {
+    return this.instructions.map(row =>
+      this.HUDBorder(row.padEnd(this.innerHUDWidth)));
+  }
+
   buildBorder(border, count = 15) {
-    return border.repeat(count);
+    return this.border + border.repeat(count) + this.border;
   }
 
   buildNextPieceLines(nextPiece) {
     const nextPieceGrid = this.createNextPieceGrid(nextPiece);
+    const next = 'NEXT : ';
     return [
-      ` 𝐔 𝐏 𝐍 𝐄 𝐗 𝐓 : `,
-      "",
-      ...nextPieceGrid.map((row) => row.join("")),
+      this.HUDBorder(this.centerText(next)),
+      this.defaultHUDLine,
+      ...nextPieceGrid.map((row) => this.HUDBorder(row.join(""))),
     ];
   }
 
   createNextPieceGrid(piece) {
-    const size = 4;
     const grid = Array.from(
-      { length: size },
-      () => Array(size).fill(this.empty),
+      { length: this.maxHeight },
+      () => Array(this.innerHUDWidth/2).fill(this.empty),
     );
 
-    piece.tetrimino.forEach((row, y) =>
+    piece.tetrimino.forEach((row, y) => 
       row.forEach((cell, x) => {
-        if (cell) grid[y][x] = piece.color;
+        if (cell) grid[y][x + 4] = piece.color;
       })
     );
 
     return grid;
   }
 
-  buildScoreLines({ points, lines }) {
+  buildScoreLines({ points, lines, level }) {
+    const score = `SCORE : ${points}`;
+    const line = `LINES : ${lines}`;
+    const lvl = `LEVEL : ${level}`;
     return [
+      this.defaultHUDLine,
+      this.HUDBorder(this.centerText(score)),
+      this.HUDBorder(this.centerText(line)),
+      this.HUDBorder(this.centerText(lvl)),
+      this.defaultHUDLine,
       this.separator(),
-      `🔰 𝑺 𝑪 𝑶 𝑹 𝑬 : ${points} 🏆`,
-      this.separator(),
-      `✮ 𝑳 𝑰 𝑵 𝑬 𝑺 : ${lines}`,
-      "",
     ];
   }
 
+  HUDBorder(content) {
+    return content + this.border.repeat(2);
+  }
+
   separator() {
-    return this.horizontal.repeat(15);
+    return this.border.repeat(this.HUDWidth);
   }
 
   combineWith(boardLines, hudLines, width) {
@@ -98,25 +125,34 @@ export class Formatter {
 
     for (let i = 0; i < boardLines.length; i++) {
       const boardLine = boardLines[i];
-      const hudLine = hudLines[i] || "";
-      lines.push(boardLine + "  " + hudLine);
+      const hudLine = hudLines[i] || this.defaultHUDLine;
+      if (i === boardLines.length - 1) {
+        lines.push(boardLine + this.separator());
+        break;
+      }
+
+      lines.push(boardLine + hudLine);
     }
 
-    return [header, ...lines].join("\n");
+    return [header, ...lines, this.buildTitleBorder(width)].join("\n");
   }
 
   buildHeader(width) {
-    const totalWidth = (width + 1) * 2;
-    const lengthToPad = Math.floor((totalWidth + this.title.length) / 2);
-    const middleLine = this.title.padStart(lengthToPad).padEnd(totalWidth);
+    const totalWidth = width * 4;
+    const middleLine = this.centerText(this.title, totalWidth);
     return [
-      this.buildTitleBorder(this.corners.top, width),
-      this.wrapWith(middleLine, this.vertical),
-      this.buildTitleBorder(this.corners.bottom, width),
+      this.buildTitleBorder(width),
+      this.wrapWith(middleLine, this.border, this.border),
+      this.buildTitleBorder(width),
     ].join("\n");
   }
 
-  buildTitleBorder({ left, right }, width) {
-    return left + this.horizontal.repeat(width) + right;
+  buildTitleBorder(width) {
+    return this.border.repeat(width + 4 + this.HUDWidth);
+  }
+
+  centerText(text, totalWidth = this.innerHUDWidth) {
+    const lengthToPad = Math.floor((totalWidth + text.length) / 2);
+    return text.padStart(lengthToPad).padEnd(totalWidth);
   }
 }

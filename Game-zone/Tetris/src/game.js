@@ -8,6 +8,7 @@ export class Tetris {
     this.score = {
       points: 0,
       lines: 0,
+      level: 1,
     }
 
     this.#init();
@@ -96,8 +97,9 @@ export class Tetris {
 
   updateScore(linesCleared) {
     const points = { 0: 0, 1: 40, 2: 100, 3: 300, 4: 1200 };
-    this.score.points += linesCleared in points ? points[linesCleared] * 1 : 2000;
+    this.score.points += points[linesCleared] * this.score.level;
     this.score.lines += linesCleared;
+    this.score.level = Math.floor(this.score.lines / 10) + 1;
   }
 
   gameOver() {
