@@ -68,7 +68,7 @@ export class Board {
   }
 
   formatBoard(grid, nextPiece) {
-    return this.format.frameTetrisSpace(this.width, grid, nextPiece);
+    return this.format.frameTetrisSpace(grid, nextPiece);
   }
 
   draw(piece, nextPiece, score) {

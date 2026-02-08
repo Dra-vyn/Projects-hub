@@ -10,82 +10,89 @@ export class Formatter {
       bottom: { left: "┗━", right: "━┛" },
     };
     this.vertical = "┃";
-    this.horizontal = "━";
+    this.horizontal = "━━";
   }
 
-  frameTetrisSpace(width, grid, hud) {
-    const layoutMetrics = this.computeLayout(width);
+  frameTetrisSpace(grid, hud) {
+    const width = grid[0].length;
+    const header = this.buildHeader(width)
+    const boardLines = this.buildBoardLines(grid);
+    const hudLines = this.buildHUD(hud);
+    const border = this.buildBorder(this.border, width + 2);
+    return [...header, border, ...hudLines, border, ...boardLines].join('\n');
+  }
+
+  buildBoardLines(grid) {
+    const width = grid[0].length + 2;
+    const boardLine = grid.map((row) =>
+      this.wrapWith(this.renderRowCells(row), this.wall)
+    );
     return [
-      ...this.header(layoutMetrics),
-      ...this.hud(layoutMetrics, hud),
-      ...this.renderBoard(grid, layoutMetrics),
-    ].join("\n");
-  }
-
-  computeLayout(playFieldWidth) {
-    const cellWidth = 2;
-    const titleWallWidth = this.vertical.length;
-    const contentWidth = playFieldWidth * cellWidth;
-    return {
-      playFieldWidth,
-      titleWallWidth,
-      contentWidth,
-      titleInnerWidth: contentWidth + titleWallWidth,
-      frameWidth: contentWidth + 2 * cellWidth,
-    };
-  }
-
-  header(layoutMetrics) {
-    const top = this.renderBorder(this.corners.top, layoutMetrics);
-    const centeredText = this.centerText(this.title, layoutMetrics);
-    const middle = this.frameWith(this.vertical, centeredText, this.vertical);
-    const bottom = this.renderBorder(this.corners.bottom, layoutMetrics);
-    return [top, middle, bottom];
-  }
-
-  hud({ frameWidth }, { nextPiece, score }) {
-    const wallBorder = this.border.repeat(frameWidth / 2);
-    const piece = this.renderNextPiece(nextPiece);
-    const scores = this.renderScore(score)
-    return [wallBorder,piece, scores, wallBorder]
-  }
-
-  renderScore({ points, lines }) {
-    return `Score : ${points}   lines Cleared : ${lines}`
-  }
-
-  renderNextPiece(piece) {
-    const nextPiece = piece.tetrimino
-      .map(row => row.map(cell => cell ? piece.color : '  ').join('')).join('\n');
-
-    return `Next Piece :\n${nextPiece}`;
-  }
-
-  renderBorder({ left, right }, { contentWidth }) {
-    return left + this.horizontal.repeat(contentWidth) + right;
-  }
-
-  frameWith(left, content, right) {
-    return left + content + right;
-  }
-
-  centerText(text, { titleInnerWidth, frameWidth }) {
-    return text
-      .padStart((titleInnerWidth + text.length) / 2)
-      .padEnd(frameWidth - 2);
-  }
-
-  renderBoard(grid, { frameWidth }) {
-    const wallBorder = this.wall.repeat(frameWidth / 2);
-    return [
-      wallBorder,
-      ...grid.map((row) => this.renderBoardRow(row)),
-      wallBorder,
+      this.buildBorder(this.wall, width),
+      ...boardLine,
+      this.buildBorder(this.wall, width),
     ];
   }
 
-  renderBoardRow(row) {
-    const content = row.map((cell) => cell || this.empty).join("");
-    return this.frameWith(this.wall, content, this.wall);
+  renderRowCells(row) {
+    return row.map((cell) => cell || this.empty).join("");
+  }
+
+  wrapWith(content, wall) {
+    return wall + content + wall;
+  }
+
+  buildHUD({ nextPiece, score }) {
+    return [
+      ...this.buildNextPieceLines(nextPiece),
+      this.buildScoreLines(score),
+    ];
+  }
+
+  buildBorder(border, count = 15) {
+    return border.repeat(count);
+  }
+
+  buildNextPieceLines(nextPiece) {
+    const nextPieceGrid = this.createNextPieceGrid(nextPiece);
+    return [
+      `UP NEXT : `,
+      ...nextPieceGrid.map((row) => row.join("")),
+    ];
+  }
+
+  createNextPieceGrid(piece) {
+    const size = 3;
+    const grid = Array.from(
+      { length: size },
+      () => Array(size).fill(this.empty),
+    );
+
+    piece.tetrimino.forEach((row, y) =>
+      row.forEach((cell, x) => {
+        if (cell) grid[y][x] = piece.color;
+      })
+    );
+
+    return grid;
+  }
+
+  buildScoreLines({ points, lines }) {
+    return `Score : ${[points]}   Lines : ${lines}`;
+  }
+
+  buildHeader(width) {
+    const totalWidth = (width + 1) * 2;
+    const lengthToPad = Math.floor((totalWidth + this.title.length) / 2);
+    const middleLine = this.title.padStart(lengthToPad).padEnd(totalWidth);
+    return [
+      this.buildTitleBorder(this.corners.top, width),
+      this.wrapWith(middleLine, this.vertical),
+      this.buildTitleBorder(this.corners.bottom, width),
+    ];
+  }
+
+  buildTitleBorder({ left, right }, width) {
+    return left + this.horizontal.repeat(width) + right;
   }
 }
