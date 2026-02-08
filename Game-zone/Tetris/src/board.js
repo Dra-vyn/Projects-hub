@@ -5,10 +5,10 @@ export class Board {
     this.width = width;
     this.height = height;
     this.format = new Formatter();
-    this.init();
+    this.#init();
   }
 
-  init() {
+  #init() {
     this.grid = this.createBoard();
   }
 
@@ -71,11 +71,10 @@ export class Board {
     return this.format.frameTetrisSpace(grid, nextPiece);
   }
 
-  draw(piece, nextPiece, score) {
-    const hud = { nextPiece, score };
+  draw(game) {
     console.clear();
-    const grid = this.render(piece);
-    const output = this.formatBoard(grid, hud);
+    const grid = this.render(game.activePiece);
+    const output = this.formatBoard(grid, game);
     console.log(output);
   }
 }

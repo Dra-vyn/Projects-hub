@@ -11,9 +11,10 @@ export class Formatter {
       `  ➡   : MOVE RIGHT`,
       `  ⬇   : SOFT DROP`,
       `  ⬆   : ROTATE PIECE`,
+      ` SPACE : HARD DROP`,
       '',
       `  ESC : PAUSE / CONTINUE`,
-      `  CTRL + c : EXIT`
+      `  CTRL + c : EXIT`,
     ];
 
     this.init();
@@ -24,10 +25,10 @@ export class Formatter {
     this.defaultHUDLine = this.HUDBorder(this.centerText(""));
   }
 
-  frameTetrisSpace(grid, hud) {
+  frameTetrisSpace(grid, game) {
     const width = grid[0].length;
     const boardLines = this.buildBoardLines(grid);
-    const hudLines = this.buildHUD(hud);
+    const hudLines = this.buildHUD(game);
     return this.combineWith(boardLines, hudLines, width);
   }
 

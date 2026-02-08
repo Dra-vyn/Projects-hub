@@ -7,6 +7,7 @@ export class Controls {
       "\u001b[C": () => this.game.moveRight(),
       "\u001b[B": () => this.game.softDrop(),
       "\u001b[A": () => this.game.rotate(),
+      " " : () => this.game.hardDrop(),
     };
 
     this.otherControls = {
@@ -21,8 +22,7 @@ export class Controls {
     for await (const chunk of Deno.stdin.readable) {
       const key = decoder.decode(chunk);
       this.handleInput(key);
-      if (!this.paused)
-        this.game.board.draw(this.game.activePiece, this.game.nextPiece, this.game.score);
+      if (!this.paused) this.game.board.draw(this.game);
     }
   }
 
@@ -36,7 +36,8 @@ export class Controls {
 
   togglePause() {
     this.paused = !this.paused;
-    const msg = this.paused ? "Game PAUSED!" : "Game RESUMED";
-    console.log(`%c${msg}`, "color : green");
+    if (this.paused) {
+      console.log(`%cGame PAUSED!  Press ESC to Continue!`, "color : green");
+    }
   }
 }

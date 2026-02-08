@@ -10,29 +10,33 @@ export class Tetris {
       lines: 0,
       level: 1,
     }
-
-    this.#init();
+    
+    this.spawnPiece();
   }
 
-  #init() {
+  spawnPiece() {
     this.advanceToNextPiece();
-    this.nextPiece = this.spawnPiece();
+    this.nextPiece = this.getNewPiece();
   }
 
   advanceToNextPiece() {
-    this.activePiece = this.nextPiece || this.spawnPiece();
+    this.activePiece = this.nextPiece || this.getNewPiece();
     this.handleGameOver();
     return this.activePiece;
   }
 
-  spawnPiece() {
+  getNewPiece() {
     const block = this.randomTetrimino();
     const { x, y } = this.spawnPosition(block);
     return new Piece(block.tetrimino, block.color, x, y);
   }
 
   randomTetrimino() {
-    return BLOCKS[Math.floor(Math.random() * BLOCKS.length)];
+    return BLOCKS[this.getRandomBlockIndex()];
+  }
+
+  getRandomBlockIndex() {
+    return Math.floor(Math.random() * BLOCKS.length);
   }
 
   spawnPosition(block) {
@@ -60,6 +64,19 @@ export class Tetris {
 
   softDrop() {
     this.move(0, 1);
+    this.score.points++;
+  }
+
+  hardDrop() {
+    let points = -2;
+    while (this.canPlacePiece(this.activePiece)) {
+      this.activePiece.y++;
+      points += 2;
+    }
+
+    this.activePiece.y--;
+    this.score.points += points;
+    this.board.lockPiece(this.activePiece);
   }
 
   rotate() {
@@ -85,14 +102,14 @@ export class Tetris {
       this.finalizePiece();
     }
 
-    this.board.draw(this.activePiece, this.nextPiece, this.score);
+    this.board.draw(this);
   }
 
   finalizePiece() {
     this.board.lockPiece(this.activePiece);
     const linesCleared = this.board.clearLines();
     this.updateScore(linesCleared);
-    this.#init();
+    this.spawnPiece();
   }
 
   updateScore(linesCleared) {
