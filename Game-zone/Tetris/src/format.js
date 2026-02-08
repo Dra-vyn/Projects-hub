@@ -15,11 +15,9 @@ export class Formatter {
 
   frameTetrisSpace(grid, hud) {
     const width = grid[0].length;
-    const header = this.buildHeader(width)
     const boardLines = this.buildBoardLines(grid);
     const hudLines = this.buildHUD(hud);
-    const border = this.buildBorder(this.border, width + 2);
-    return [...header, border, ...hudLines, border, ...boardLines].join('\n');
+    return this.combineWith(boardLines, hudLines, width);
   }
 
   buildBoardLines(grid) {
@@ -44,8 +42,10 @@ export class Formatter {
 
   buildHUD({ nextPiece, score }) {
     return [
+      this.buildBorder(this.border),
       ...this.buildNextPieceLines(nextPiece),
-      this.buildScoreLines(score),
+      ...this.buildScoreLines(score),
+      this.buildBorder(this.border),
     ];
   }
 
@@ -56,13 +56,14 @@ export class Formatter {
   buildNextPieceLines(nextPiece) {
     const nextPieceGrid = this.createNextPieceGrid(nextPiece);
     return [
-      `UP NEXT : `,
+      ` 𝐔 𝐏 𝐍 𝐄 𝐗 𝐓 : `,
+      "",
       ...nextPieceGrid.map((row) => row.join("")),
     ];
   }
 
   createNextPieceGrid(piece) {
-    const size = 3;
+    const size = 4;
     const grid = Array.from(
       { length: size },
       () => Array(size).fill(this.empty),
@@ -78,7 +79,30 @@ export class Formatter {
   }
 
   buildScoreLines({ points, lines }) {
-    return `Score : ${[points]}   Lines : ${lines}`;
+    return [
+      this.separator(),
+      `🔰 𝑺 𝑪 𝑶 𝑹 𝑬 : ${points} 🏆`,
+      this.separator(),
+      `✮ 𝑳 𝑰 𝑵 𝑬 𝑺 : ${lines}`,
+      "",
+    ];
+  }
+
+  separator() {
+    return this.horizontal.repeat(15);
+  }
+
+  combineWith(boardLines, hudLines, width) {
+    const header = this.buildHeader(width);
+    const lines = [];
+
+    for (let i = 0; i < boardLines.length; i++) {
+      const boardLine = boardLines[i];
+      const hudLine = hudLines[i] || "";
+      lines.push(boardLine + "  " + hudLine);
+    }
+
+    return [header, ...lines].join("\n");
   }
 
   buildHeader(width) {
@@ -89,7 +113,7 @@ export class Formatter {
       this.buildTitleBorder(this.corners.top, width),
       this.wrapWith(middleLine, this.vertical),
       this.buildTitleBorder(this.corners.bottom, width),
-    ];
+    ].join("\n");
   }
 
   buildTitleBorder({ left, right }, width) {
