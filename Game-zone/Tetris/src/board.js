@@ -1,14 +1,11 @@
-import { Formatter } from "./format.js";
+import { FrameRenderer } from "./renderer.js";
+import { isBetween, setMatrix } from "./utils.js";
 
 export class Board {
   constructor(width, height) {
     this.width = width;
     this.height = height;
-    this.format = new Formatter();
-    this.#init();
-  }
-
-  #init() {
+    this.build = new FrameRenderer(width);
     this.grid = this.createBoard();
   }
 
@@ -23,7 +20,7 @@ export class Board {
   drawPieceOn(board, { tetrimino, color, x, y }) {
     tetrimino.forEach((row, dy) =>
       row.forEach((cell, dx) => {
-        if (cell) board[y + dy][x + dx] = color;
+        if (cell) setMatrix(board, y + dy, x + dx, color);
       })
     );
   }
@@ -48,7 +45,7 @@ export class Board {
   }
 
   isInside(x, y) {
-    return x >= 0 && x < this.width && y >= 0 && y < this.height;
+    return isBetween(x, this.width) && isBetween(y, this.height);
   }
 
   isCellOccupied(x, y) {
@@ -63,18 +60,18 @@ export class Board {
 
   render(piece) {
     const temp = this.createTempBoard();
-    if (piece) this.drawPieceOn(temp, piece);
+    this.drawPieceOn(temp, piece);
     return temp;
   }
 
-  formatBoard(grid, nextPiece) {
-    return this.format.frameTetrisSpace(grid, nextPiece);
+  formatBoard(grid, game) {
+    return this.format.frameMatrix(grid, game);
   }
 
   draw(game) {
     console.clear();
     const grid = this.render(game.activePiece);
-    const output = this.formatBoard(grid, game);
+    const output = this.build.render(grid, game);
     console.log(output);
   }
 }

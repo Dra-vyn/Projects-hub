@@ -7,28 +7,29 @@ export class Formatter {
     this.HUDWidth = 15;
     this.maxHeight = 4;
     this.instructions = [
-      `  ⬅   : MOVE LEFT`,
-      `  ➡   : MOVE RIGHT`,
-      `  ⬇   : SOFT DROP`,
-      `  ⬆   : ROTATE PIECE`,
-      ` SPACE : HARD DROP`,
-      '',
+      `  ⬅️   : MOVE LEFT`,
+      `  ➡️   : MOVE RIGHT`,
+      `  ⬇️   : SOFT DROP`,
+      `  ⬆️   : ROTATE PIECE`,
+      `  SPACE : HARD DROP`,
+      "",
       `  ESC : PAUSE / CONTINUE`,
-      `  CTRL + c : EXIT`,
+      `  q : EXIT`,
     ];
 
     this.init();
   }
-  
+
   init() {
-    this.innerHUDWidth = this.HUDWidth * 2 - 4;
+    this.innerHUDWidth = (this.HUDWidth * 2) - 4;
     this.defaultHUDLine = this.HUDBorder(this.centerText(""));
   }
 
-  frameTetrisSpace(grid, game) {
+  frameMatrix(grid, game) {
     const width = grid[0].length;
     const boardLines = this.buildBoardLines(grid);
     const hudLines = this.buildHUD(game);
+
     return this.combineWith(boardLines, hudLines, width);
   }
 
@@ -37,6 +38,7 @@ export class Formatter {
     const boardLine = grid.map((row) =>
       this.wrapWith(this.renderRowCells(row), this.wall, this.border)
     );
+
     return [
       this.buildBorder(this.wall, width),
       ...boardLine,
@@ -65,8 +67,9 @@ export class Formatter {
   }
 
   buildInstructions() {
-    return this.instructions.map(row =>
-      this.HUDBorder(row.padEnd(this.innerHUDWidth)));
+    return this.instructions.map((row) =>
+      this.HUDBorder(row.padEnd(this.innerHUDWidth))
+    );
   }
 
   buildBorder(border, count = 15) {
@@ -75,7 +78,7 @@ export class Formatter {
 
   buildNextPieceLines(nextPiece) {
     const nextPieceGrid = this.createNextPieceGrid(nextPiece);
-    const next = 'NEXT : ';
+    const next = "NEXT : ";
     return [
       this.HUDBorder(this.centerText(next)),
       this.defaultHUDLine,
@@ -86,10 +89,10 @@ export class Formatter {
   createNextPieceGrid(piece) {
     const grid = Array.from(
       { length: this.maxHeight },
-      () => Array(this.innerHUDWidth/2).fill(this.empty),
+      () => Array(this.innerHUDWidth / 2).fill(this.empty),
     );
 
-    piece.tetrimino.forEach((row, y) => 
+    piece.tetrimino.forEach((row, y) =>
       row.forEach((cell, x) => {
         if (cell) grid[y][x + 4] = piece.color;
       })
