@@ -6,6 +6,7 @@ import {
   repeat,
   setMatrix,
   wrapWith,
+  midPoint,
 } from "./utils.js";
 
 export class FrameRenderer {
@@ -46,7 +47,9 @@ export class FrameRenderer {
   }
 
   render(grid, game) {
-    const boardLines = this.renderBoard(grid);
+    let boardLines = this.renderBoard(grid);
+    boardLines = this.renderOverlay(boardLines, game);
+
     const HUDLines = this.renderHUD(game);
 
     return this.combineWith(boardLines, HUDLines, game.title);
@@ -67,6 +70,21 @@ export class FrameRenderer {
 
   renderCells(row) {
     return row.map((cell) => cell || this.empty).join("");
+  }
+
+  renderOverlay(boardLines, { state, overlayText }) {
+    if (!state.isPaused && !state.gameOver) return boardLines;
+    const center = midPoint(boardLines.length);
+    const width = boardLines[0].length;
+
+    const text = state.isPaused
+      ? overlayText['paused']
+      : overlayText['gameOver'];
+    
+    const overlayLine = centerAlign(text, width - 4);
+    const overlay = wrapWith(this.wall, overlayLine);
+
+    return boardLines.map((line, i) => i === center ? overlay : line);
   }
 
   renderHUD({ score, nextPiece, instructions, maxPieceHeight }) {
@@ -155,7 +173,7 @@ export class FrameRenderer {
       const HUDLine = HUDLines[i] || emptyLine;
       lines.push(this.wrapRow(boardLine, HUDLine));
     }
-    
+
     const boardLine = boardLines.at(-1);
     lines.push(this.wrapRow(boardLine, separatorLine));
 

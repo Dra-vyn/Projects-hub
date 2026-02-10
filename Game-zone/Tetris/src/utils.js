@@ -10,8 +10,8 @@ export const setMatrix = (matrix, row, column, element) =>
 
 export const isBetween = (value, limit) => 0 <= value && value < limit;
 
-export const midPoint = (totalLength, itemLength) =>
-  +Math.floor((totalLength + itemLength) / 2);
+export const midPoint = (totalLength, itemLength = 0) =>
+  Math.floor((totalLength + itemLength) / 2);
 
 export const createGrid = (height, width, filler) =>
   Array.from({ length: height }, () => Array(width).fill(filler));

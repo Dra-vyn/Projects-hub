@@ -10,6 +10,18 @@ export class Tetris {
     this.score = { points: 0, lines: 0, level: 1 };
     this.points = { 0: 0, 1: 40, 2: 100, 3: 300, 4: 1200 };
     this.title = "T E T R I S";
+    this.overlayText = {
+      paused: `PAUSED: Press ESC to Continue`,
+      gameOver: `Game Over!`
+    }
+
+    this.state = {
+      isPaused: false,
+      isGameOver: false,
+      isRestart: false,
+      isExit: false,
+    }
+
     this.instructions = [
       `  ⬅️   : MOVE LEFT`,
       `  ➡️   : MOVE RIGHT`,
@@ -18,7 +30,9 @@ export class Tetris {
       `  SPACE : HARD DROP`,
       "",
       `  ESC : PAUSE / CONTINUE`,
+      `  r : RESTART`,
       `  q : EXIT`,
+      `  CTRL + C : FORCE QUIT`,
     ];
     
     this.init();
@@ -129,6 +143,18 @@ export class Tetris {
     this.score.points += this.points[linesCleared] * this.score.level;
     this.score.lines += linesCleared;
     this.score.level = Math.floor(this.score.lines / 10) + 1;
+  }
+
+  togglePause() {
+    this.state.isPaused = !this.state.isPaused;
+  }
+
+  restart() {
+    this.state.isRestart = true;
+  }
+
+  exit() {
+    this.state.isExit = true;
   }
 
   gameOver() {
