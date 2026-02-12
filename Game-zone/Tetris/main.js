@@ -1,7 +1,8 @@
-import { boot } from "./src/boot.js";
+import { input, select } from "@inquirer/prompts";
+import { launchApp } from "./src/interface.js";
 
 const main = async () => {
-  return await boot();
+  return await launchApp(input, select);
 };
 
 await main();

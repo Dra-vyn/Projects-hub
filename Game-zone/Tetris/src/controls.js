@@ -34,20 +34,22 @@ export class Controls {
     };
   }
 
-  async inputListener() {
+  async listenInput() {
     const buffer = new Uint8Array(10);
     Deno.stdin.setRaw(true);
 
-    while (true) {
+    while (!this.isQuit(this.game.state)) {
       const noOfBytesRead = await Deno.stdin.read(buffer);
       const key = this.decoder.decode(buffer.slice(0, noOfBytesRead));
 
       this.handleInput(key);
 
-      if (this.game.state.isRestart || this.game.state.isExit) return;
-
       this.game.board.draw(this.game);
     }
+  }
+
+  isQuit({ isGameOver, isExit, isRestart}) {
+    return isGameOver || isExit || isRestart;
   }
 
   handleInput(key) {

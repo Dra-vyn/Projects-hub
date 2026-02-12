@@ -153,13 +153,16 @@ export class Tetris {
     this.state.isRestart = true;
   }
 
+  draw() {
+    this.board.draw(this);
+  }
+
   exit() {
     this.state.isExit = true;
   }
 
   gameOver() {
-    console.clear();
-    console.log("%c 💀 GAME OVER", "color : red");
-    Deno.exit();
+    this.state.isGameOver = true;
+    this.board.draw(this);
   }
 }

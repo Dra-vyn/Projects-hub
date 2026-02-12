@@ -26,6 +26,7 @@ export class FrameRenderer {
   setLayoutWidths() {
     const framedBoardWidth = this.boardWidth + 2;
     const HUDInnerWidth = this.boardWidth - 2;
+    
     return {
       framedBoardWidth,
       HUDInnerWidth,
@@ -73,7 +74,8 @@ export class FrameRenderer {
   }
 
   renderOverlay(boardLines, { state, overlayText }) {
-    if (!state.isPaused && !state.gameOver) return boardLines;
+    if (!state.isPaused && !state.isGameOver) return boardLines;
+
     const center = midPoint(boardLines.length);
     const width = boardLines[0].length;
 
@@ -89,6 +91,7 @@ export class FrameRenderer {
 
   renderHUD({ score, nextPiece, instructions, maxPieceHeight }) {
     const { separatorLine } = this.layout;
+
     return [
       separatorLine,
       ...this.gameStats(score),
@@ -101,6 +104,7 @@ export class FrameRenderer {
 
   gameStats({ points, lines, level }) {
     const stats = [`SCORE : ${points}`, `LINES : ${lines}`, `LEVEL : ${level}`];
+    
     const width = this.width.HUDRendererWidth;
     const scoreLines = stats.map((stat) => centerAlign(stat, width));
     const { emptyLine } = this.layout;
@@ -183,6 +187,7 @@ export class FrameRenderer {
   wrapRow(boardLine, HUDLine) {
     const HUDLines = wrapWith(this.edge, HUDLine);
     const combined = boardLine + HUDLines;
+
     return wrapWith(this.edge, combined);
   }
 }

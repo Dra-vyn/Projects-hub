@@ -2,27 +2,29 @@ import { Controls } from "./controls.js";
 import { Tetris } from "./game.js";
 
 const advanceGame = (game) => {
-  if (game.state.isPaused) return;
+  if (game.state.isPaused || game.state.isGameOver) return;
   game.update();
 };
 
-const calculateSpeed = (level) => Math.max(100, 500 - (level * 50));
+const calculateSpeed = (level) => Math.max(100, 500 - (level * 70));
 
 export const boot = async () => {
-  const game = new Tetris(15, 30);
-  const control = new Controls(game);
-
-  await startGame(game, control);
-  if (game.state.isRestart) return await boot();
+  while (true) {
+    const game = new Tetris(15, 30);
+    const control = new Controls(game);
+  
+    await startGame(game, control);
+    if (!game.state.isRestart) return game.score;
+  }
 };
 
 const startGame = async (game, control) => {
   const speed = calculateSpeed(game.score.level);
 
-  game.board.draw(game);
+  game.draw();
   const intervalID = setInterval(() => advanceGame(game), speed);
-  await control.inputListener();
+  await control.listenInput();
 
   clearInterval(intervalID);
-
+  return game.score;
 };

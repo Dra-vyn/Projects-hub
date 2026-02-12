@@ -5,8 +5,10 @@ export const rotateRight = (array) =>
 
 export const getCenterOffset = (total, part) => Math.floor((total - part) / 2);
 
-export const setMatrix = (matrix, row, column, element) =>
+export const setMatrix = (matrix, row, column, element) => {
   matrix[row][column] = element;
+  return matrix
+}
 
 export const isBetween = (value, limit) => 0 <= value && value < limit;
 
