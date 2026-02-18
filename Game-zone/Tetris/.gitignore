@@ -1,4 +1,6 @@
+.vscode
 dummy.md
 map.md
 format.js
-src/ui/
+src/inquirer_interface/
+tetris.db

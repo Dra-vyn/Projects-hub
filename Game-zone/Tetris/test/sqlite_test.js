@@ -1,7 +1,7 @@
 import { assertEquals } from "@std/assert";
 import { describe, it, beforeEach } from "@std/testing/bdd";
-import { Stats } from "../src/sqlite.js";
-import { QUERY } from "../src/queries.js";
+import { Stats } from "../src/inquirer_interface/sqlite.js";
+import { QUERY } from "../src/inquirer_interface/queries.js";
 
 describe("▶ INITIALIZE TABLE IN SQLITE", () => {
   let database;

@@ -28,3 +28,5 @@ export const centerAlign = (text, length) => {
 export const repeat = (char, length) => char.repeat(length);
 
 export const wrapWith = (char, content) => char + content + char;
+
+export const repeatLine = (line, count) => Array(count).fill(line);

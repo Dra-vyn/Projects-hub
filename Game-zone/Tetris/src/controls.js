@@ -38,10 +38,11 @@ export class Controls {
     const buffer = new Uint8Array(10);
     Deno.stdin.setRaw(true);
 
-    while (!this.isQuit(this.game.state)) {
+    while (true) {
       const noOfBytesRead = await Deno.stdin.read(buffer);
       const key = this.decoder.decode(buffer.slice(0, noOfBytesRead));
 
+      if (this.isQuit(this.game.state)) return;
       this.handleInput(key);
 
       this.game.board.draw(this.game);
