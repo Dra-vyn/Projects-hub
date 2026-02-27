@@ -32,7 +32,6 @@ export class Tetris {
       `  ESC : PAUSE / CONTINUE`,
       `  r : RESTART`,
       `  q : EXIT`,
-      `  CTRL + C : FORCE QUIT`,
     ];
     
     this.init();
@@ -97,15 +96,23 @@ export class Tetris {
     this.score.points++;
   }
 
+  getNextPiecePosition(activePiece) {
+    activePiece.y++;
+
+    return activePiece
+  }
+
   hardDrop() {
-    let points = -2;
-    while (this.canPlacePiece(this.activePiece)) {
+    // let points = -2;
+    const activePiece = { ...this.activePiece };
+
+    while (this.canPlacePiece(this.getNextPiecePosition(activePiece))) {
       this.activePiece.y++;
-      points += 2;
+      this.score.points += 2;
     }
 
-    this.activePiece.y--;
-    this.score.points += points;
+    // this.activePiece.y = activePiece.y - 1;
+    // this.score.points += points;
     this.board.lockPiece(this.activePiece);
     this.finalizePiece();
   }
@@ -129,7 +136,8 @@ export class Tetris {
       this.finalizePiece();
     }
 
-    this.board.draw(this);
+    // this.board.draw(this);
+    this.getState();
   }
 
   finalizePiece() {
@@ -153,16 +161,21 @@ export class Tetris {
     this.state.isRestart = true;
   }
 
-  draw() {
-    this.board.draw(this);
-  }
+  // draw() {
+    // this.board.draw(this);
+    // this.getState()
+  // }
 
   exit() {
     this.state.isExit = true;
   }
 
+  getState() {
+    return { grid: this.board.render(this.activePiece), game : this }
+  }
+
   gameOver() {
     this.state.isGameOver = true;
-    this.board.draw(this);
+    // this.board.draw(this);
   }
 }

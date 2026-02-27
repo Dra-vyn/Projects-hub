@@ -1,6 +1,7 @@
 export class Controls {
-  constructor(game) {
+  constructor(game, renderer) {
     this.game = game;
+    this.renderer = renderer;
     this.decoder = new TextDecoder();
     this.init();
   }
@@ -27,7 +28,6 @@ export class Controls {
     };
 
     this.otherControls = {
-      "ctrl + c": () => Deno.exit(),
       "q": () => this.game.exit(),
       "r": () => this.game.restart(),
       "esc": () => this.game.togglePause(),
@@ -36,16 +36,17 @@ export class Controls {
 
   async listenInput() {
     const buffer = new Uint8Array(10);
-    Deno.stdin.setRaw(true);
+    Deno.stdin.setRaw(true, { cbreak: true });
 
-    while (true) {
+    while (!this.isQuit(this.game.state)) {
       const noOfBytesRead = await Deno.stdin.read(buffer);
       const key = this.decoder.decode(buffer.slice(0, noOfBytesRead));
 
-      if (this.isQuit(this.game.state)) return;
+      // if (this.isQuit(this.game.state)) return;
       this.handleInput(key);
 
-      this.game.board.draw(this.game);
+      // this.game.board.draw(this.game);
+      this.renderer.render(this.game.getState());
     }
   }
 

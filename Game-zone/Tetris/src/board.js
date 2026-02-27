@@ -1,11 +1,11 @@
-import { FrameRenderer } from "./renderer.js";
+// import { TerminalFrameRenderer } from "./renderer.js";
 import { isBetween, setMatrix } from "./utils.js";
 
 export class Board {
   constructor(width, height) {
     this.width = width;
     this.height = height;
-    this.build = new FrameRenderer(width);
+    // this.build = new FrameRenderer(width);
     this.grid = this.createBoard();
   }
 
@@ -64,14 +64,10 @@ export class Board {
     return temp;
   }
 
-  formatBoard(grid, game) {
-    return this.format.frameMatrix(grid, game);
-  }
-
-  draw(game) {
-    console.clear();
-    const grid = this.render(game.activePiece);
-    const output = this.build.render(grid, game);
-    console.log(output);
-  }
+  // draw(game) {
+  //   console.clear();
+  //   const grid = this.render(game.activePiece);
+  //   const output = this.build.render(grid, game);
+  //   console.log(output); 
+  // }
 }

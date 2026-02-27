@@ -1,6 +1,10 @@
 .vscode
 dummy.md
 map.md
-format.js
 src/inquirer_interface/
+src/format.js
+test/sqlite_test.js
 tetris.db
+deno.json
+deno.lock
+goal.md

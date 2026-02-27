@@ -9,7 +9,7 @@ import {
   midPoint,
 } from "./utils.js";
 
-export class FrameRenderer {
+export class TerminalFrameRenderer {
   constructor(width) {
     this.boardWidth = width;
     this.wall = "🟫";
@@ -47,7 +47,13 @@ export class FrameRenderer {
     };
   }
 
-  render(grid, game) {
+  render({ grid, game }) {
+    console.clear();
+    const output = this.buildFrame(grid, game);
+    console.log(output);
+  }
+
+  buildFrame(grid, game) {
     let boardLines = this.renderBoard(grid);
     boardLines = this.renderOverlay(boardLines, game);
 
