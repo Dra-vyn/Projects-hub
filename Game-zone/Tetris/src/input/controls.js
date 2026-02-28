@@ -42,10 +42,8 @@ export class Controls {
       const noOfBytesRead = await Deno.stdin.read(buffer);
       const key = this.decoder.decode(buffer.slice(0, noOfBytesRead));
 
-      // if (this.isQuit(this.game.state)) return;
       this.handleInput(key);
 
-      // this.game.board.draw(this.game);
       this.renderer.render(this.game.getState());
     }
   }

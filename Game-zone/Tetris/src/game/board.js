@@ -1,11 +1,9 @@
-// import { TerminalFrameRenderer } from "./renderer.js";
-import { isBetween, setMatrix } from "./utils.js";
+import { isBetween, setMatrix } from "../utils/utils.js";
 
 export class Board {
   constructor(width, height) {
     this.width = width;
     this.height = height;
-    // this.build = new FrameRenderer(width);
     this.grid = this.createBoard();
   }
 
@@ -49,7 +47,7 @@ export class Board {
   }
 
   isCellOccupied(x, y) {
-    return !this.isInside(x, y) || this.grid[y][x];
+    return !this.isInside(x, y) || Boolean(this.grid[y][x]);
   }
 
   isPieceColliding({ tetrimino, x, y }) {
@@ -64,10 +62,4 @@ export class Board {
     return temp;
   }
 
-  // draw(game) {
-  //   console.clear();
-  //   const grid = this.render(game.activePiece);
-  //   const output = this.build.render(grid, game);
-  //   console.log(output); 
-  // }
 }

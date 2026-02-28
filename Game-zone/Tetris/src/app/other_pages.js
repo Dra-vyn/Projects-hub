@@ -26,10 +26,10 @@ export const listAllStats = async (database, playerId) => {
 
   while (true) {
     console.clear();
-    const { games_played, max_score, total } = database.listAllStats(playerId);
+    const { games_played, max_score, total_lines } = database.listAllStats(playerId);
 
     const content =
-      `Total Games Played : ${games_played}\nHighest Score : ${max_score}\nTotal Lines Cleared  : ${total}`;
+      `Total Games Played : ${games_played}\nHighest Score : ${max_score}\nTotal Lines Cleared  : ${total_lines}`;
 
     console.log(`${content}\n\n Press Enter To Continue`);
     const n = await Deno.stdin.read(buffer);

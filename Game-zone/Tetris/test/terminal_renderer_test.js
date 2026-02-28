@@ -1,14 +1,14 @@
 import { assertEquals } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
-import { FrameRenderer } from "../src/renderer.js";
-import { Tetris } from "../src/game.js";
+import { TerminalFrameRenderer } from "../src/render/terminal_renderer.js";
+import { Tetris } from "../src/game/game.js";
 
-describe(` FRAME RENDERER`, () => {
+describe(` TERMINAL FRAME RENDERER`, () => {
   const grid = [['hello', 'hello']];
   const game = new Tetris(5, 10);
   let render;
   beforeEach(() => {
-    render = new FrameRenderer(5);
+    render = new TerminalFrameRenderer(5);
   });
 
   it(`should render board`, () =>

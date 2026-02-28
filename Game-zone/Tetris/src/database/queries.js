@@ -21,7 +21,7 @@ export const QUERY = {
       ON playersInfo.player_id = gameStats.player_id
       ORDER BY score DESC
       LIMIT 5;`,
-  listAllStats: `SELECT MAX(score) as max_score, COUNT(score) as games_played, SUM(lines_cleared) as total FROM gameStats
+  listAllStats: `SELECT MAX(score) as max_score, COUNT(score) as games_played, SUM(lines_cleared) as total_lines FROM gameStats
       WHERE player_id = ?;`,
     getUsername: `SELECT user_name FROM playersInfo WHERE user_name = ?;`,
     getPlayerId: `SELECT player_id FROM playersInfo 

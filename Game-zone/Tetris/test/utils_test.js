@@ -7,10 +7,11 @@ import {
   leftAlign,
   midPoint,
   repeat,
+  repeatLine,
   rotateRight,
   setMatrix,
   wrapWith,
-} from "../src/utils.js";
+} from "../src/utils/utils.js";
 
 Deno.test(`▶ Should transpose the given array`, () =>
   assertEquals(rotateRight([[1, 2, 3], [4, 5, 6]]), [[4, 1], [5, 2], [6, 3]]));
@@ -51,3 +52,6 @@ Deno.test(`▶ Should repeat the character according to the given length`, () =>
 
 Deno.test(`▶ Should wrap the content with a specified char`, () =>
   assertEquals(wrapWith("Aa", "bb"), "AabbAa"));
+
+Deno.test(`▶ Should repeat the same line according to the count`, () =>
+  assertEquals(repeatLine([1, 0, 1], 2), [[1, 0, 1], [1, 0, 1]]));

@@ -5,7 +5,7 @@ import {
   repeat,
   repeatLine,
   wrapWith,
-} from "../utils.js";
+} from "../utils/utils.js";
 
 export class PageRenderer {
   constructor(width, height) {

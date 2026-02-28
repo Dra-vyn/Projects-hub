@@ -1,4 +1,4 @@
-import { rotateRight } from "./utils.js";
+import { rotateRight } from "../utils/utils.js";
 
 export class Piece {
   constructor({ tetrimino, color, x, y }) {

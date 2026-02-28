@@ -1,4 +1,4 @@
-import { boot } from "../boot.js";
+import { boot } from "../game/boot.js";
 import { listAllStats, listHighScores } from "./other_pages.js";
 import { POINTER_KEYS } from "./utils.js";
 

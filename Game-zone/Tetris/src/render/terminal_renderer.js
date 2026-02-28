@@ -7,7 +7,7 @@ import {
   setMatrix,
   wrapWith,
   midPoint,
-} from "./utils.js";
+} from "../utils/utils.js";
 
 export class TerminalFrameRenderer {
   constructor(width) {

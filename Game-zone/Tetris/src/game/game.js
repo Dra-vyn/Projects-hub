@@ -1,7 +1,7 @@
-import { Board } from "./board.js";
 import { BLOCKS } from "./blocks.js";
+import { Board } from "./board.js";
 import { Piece } from "./piece.js";
-import { getCenterOffset, randomIntBelow } from "./utils.js";
+import { getCenterOffset, randomIntBelow } from "../utils/utils.js";
 import { maxOf } from "@std/collections";
 
 export class Tetris {
@@ -12,15 +12,15 @@ export class Tetris {
     this.title = "T E T R I S";
     this.overlayText = {
       paused: `PAUSED: Press ESC to Continue`,
-      gameOver: `Game Over!`
-    }
+      gameOver: `Game Over!`,
+    };
 
     this.state = {
       isPaused: false,
       isGameOver: false,
       isRestart: false,
       isExit: false,
-    }
+    };
 
     this.instructions = [
       `  ⬅️   : MOVE LEFT`,
@@ -33,7 +33,7 @@ export class Tetris {
       `  r : RESTART`,
       `  q : EXIT`,
     ];
-    
+
     this.init();
     this.spawnPiece();
   }
@@ -48,7 +48,7 @@ export class Tetris {
   }
 
   queueNextPiece() {
-    this.nextPiece = this.createPiece()
+    this.nextPiece = this.createPiece();
   }
 
   activateNextPiece() {
@@ -71,7 +71,7 @@ export class Tetris {
   spawnPosition(block) {
     const length = block.tetrimino[0].length;
     const totalWidth = this.board.width;
-    
+
     return { x: getCenterOffset(totalWidth, length), y: 0 };
   }
 
@@ -99,20 +99,16 @@ export class Tetris {
   getNextPiecePosition(activePiece) {
     activePiece.y++;
 
-    return activePiece
+    return activePiece;
   }
 
   hardDrop() {
-    // let points = -2;
     const activePiece = { ...this.activePiece };
 
     while (this.canPlacePiece(this.getNextPiecePosition(activePiece))) {
       this.activePiece.y++;
       this.score.points += 2;
     }
-
-    // this.activePiece.y = activePiece.y - 1;
-    // this.score.points += points;
     this.board.lockPiece(this.activePiece);
     this.finalizePiece();
   }
@@ -135,9 +131,6 @@ export class Tetris {
     } else {
       this.finalizePiece();
     }
-
-    // this.board.draw(this);
-    this.getState();
   }
 
   finalizePiece() {
@@ -161,21 +154,15 @@ export class Tetris {
     this.state.isRestart = true;
   }
 
-  // draw() {
-    // this.board.draw(this);
-    // this.getState()
-  // }
-
   exit() {
     this.state.isExit = true;
   }
 
   getState() {
-    return { grid: this.board.render(this.activePiece), game : this }
+    return { grid: this.board.render(this.activePiece), game: this };
   }
 
   gameOver() {
     this.state.isGameOver = true;
-    // this.board.draw(this);
   }
 }

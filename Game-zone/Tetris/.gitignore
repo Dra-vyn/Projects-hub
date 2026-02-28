@@ -1,10 +1,5 @@
 .vscode
-dummy.md
-map.md
-src/inquirer_interface/
-src/format.js
-test/sqlite_test.js
+.trash
 tetris.db
-deno.json
 deno.lock
-goal.md
+coverage/
